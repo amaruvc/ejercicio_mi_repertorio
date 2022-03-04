@@ -7,38 +7,54 @@ app.use(express.static("static"));
 
 app.post("/cancion", async (req, res) => {
   let body = "";
-  req.on("data", (data) => {
-    body += data;
-  });
+  try {
+    req.on("data", (data) => {
+      body += data;
+    });
 
-  req.on("end", async () => {
-    const datos = Object.values(JSON.parse(body));
-    const algo = await insertar(datos[0], datos[1], datos[2]);
-    res.status(201).json(algo);
-  });
+    req.on("end", async () => {
+      const datos = Object.values(JSON.parse(body));
+      const algo = await insertar(datos[0], datos[1], datos[2]);
+      res.status(201).json(algo);
+    });
+  } catch (error) {
+    return res.status(404).json({ mensaje: "No se encontró el recurso" });
+  }
 });
 
 app.get("/canciones", async (req, res) => {
-  const repertorio = await consultar();
-  res.send(JSON.stringify(repertorio));
+  try {
+    const repertorio = await consultar();
+    res.send(JSON.stringify(repertorio));
+  } catch (error) {
+    return res.status(404).json({ mensaje: "No se encontró la página" });
+  }
 });
 
 app.put("/cancion", async (req, res) => {
   let body = "";
-  req.on("data", (data) => {
-    body += data;
-  });
+  try {
+    req.on("data", (data) => {
+      body += data;
+    });
 
-  req.on("end", async () => {
-    const datos = Object.values(JSON.parse(body));
-    const algo = await editar(Number(datos[0]), datos[1], datos[2], datos[3]);
-    res.status(201).json(algo);
-  });
+    req.on("end", async () => {
+      const datos = Object.values(JSON.parse(body));
+      const algo = await editar(Number(datos[0]), datos[1], datos[2], datos[3]);
+      res.status(201).json(algo);
+    });
+  } catch (error) {
+    return res.status(404).json({ mensaje: "No se encontró la página" });
+  }
 });
 
 app.delete("/cancion", async (req, res) => {
-  await eliminar(req.query.id);
-  res.send("Eliminado");
+  try {
+    await eliminar(req.query.id);
+    res.send("Eliminado");
+  } catch (error) {
+    return res.status(404).json({ mensaje: "No se encontró la página" });
+  }
 });
 
 app.listen(3000, () => {
